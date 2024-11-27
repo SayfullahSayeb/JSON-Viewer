@@ -53,7 +53,7 @@ header {
     align-items: center;
     padding-bottom: 10px;
     border-radius: 15px;
-
+    font-family: 'Arial', sans-serif; 
 }
 
 .url-input-section input {
@@ -65,6 +65,7 @@ header {
     border: 1px solid var(--border-dark);
     border-radius: 4px;
     transition: border-color 0.3s;
+    font-family: 'Consolas', monospace; 
 }
 
 .url-input-section input:focus {
@@ -82,11 +83,13 @@ header {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
+    font-family: 'Arial', sans-serif;
 }
 
 .url-input-section button:active {
     background-color: #4CAF50;
 }
+
 
 
 .theme-toggle {
