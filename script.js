@@ -103,61 +103,103 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // File Upload
-    uploadBtn.addEventListener('click', () => {
+// File Upload
+uploadBtn.addEventListener('click', () => {
+    resetFileInput();
+    fileInput.click();
+});
+
+
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    
+    // Clear JSON input box when file is selected
+    jsonInput.value = '';
+
+
+    if (!file) {
+        showError('No file selected');
+        return;
+    }
+
+
+    if (!file.name.toLowerCase().endsWith('.json')) {
+        showError('Please upload a valid JSON file (.json)');
         resetFileInput();
-        fileInput.click();
-    });
+        return;
+    }
 
 
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+        showError('File size too large. Maximum size is 5MB');
+        resetFileInput();
+        return;
+    }
 
 
-        if (!file) {
-            showError('No file selected');
-            return;
-        }
+    const reader = new FileReader();
 
 
-        if (!file.name.toLowerCase().endsWith('.json')) {
-            showError('Please upload a valid JSON file (.json)');
-            resetFileInput();
-            return;
-        }
-
-
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-        if (file.size > maxSize) {
-            showError('File size too large. Maximum size is 5MB');
-            resetFileInput();
-            return;
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = (e) => {
-            const content = e.target.result;
+    reader.onload = (e) => {
+        const content = e.target.result;
+        try {
+            // More detailed JSON parsing with specific error messages
             try {
                 parsedJSON = JSON.parse(content);
-                clearError(); // Clear error message when a valid file is uploaded
-                updateOutput();
-            } catch (err) {
-                showError('Invalid JSON in file');
-                parsedJSON = null; // Reset parsedJSON on error
+            } catch (parseError) {
+                // Provide more specific parsing errors
+                if (parseError instanceof SyntaxError) {
+                    throw new Error(`Invalid JSON syntax: ${parseError.message}`);
+                }
+                throw parseError;
             }
-        };
 
 
-        reader.onerror = () => {
-            showError('Error reading file');
-        };
+            // Additional validation for JSON structure
+            if (parsedJSON === null) {
+                throw new Error('JSON cannot be null');
+            }
 
 
-        reader.readAsText(file);
-    });
+            if (typeof parsedJSON !== 'object' && !Array.isArray(parsedJSON)) {
+                throw new Error('JSON must be an object or an array');
+            }
+
+
+            clearError(); // Clear error message when a valid file is uploaded
+            updateOutput();
+        } catch (err) {
+            // More specific error handling
+            let errorMessage = 'Invalid JSON file';
+            
+            if (err.message.includes('Unexpected token')) {
+                errorMessage = 'JSON parsing error: Unexpected character';
+            } else if (err.message.includes('Unexpected end of JSON input')) {
+                errorMessage = 'JSON parsing error: Incomplete JSON data';
+            } else if (err.message.includes('JSON must be an object or an array')) {
+                errorMessage = 'JSON must be an object or an array';
+            }
+
+
+            showError(errorMessage);
+            parsedJSON = null; // Reset parsedJSON on error
+            formattedOutput.textContent = '';
+            treeView.innerHTML = '';
+        }
+    };
+
+
+    reader.onerror = () => {
+        showError('Error reading file');
+        parsedJSON = null;
+        formattedOutput.textContent = '';
+        treeView.innerHTML = '';
+    };
+
+
+    reader.readAsText(file);
+});
 
 
     // Clear Button
