@@ -301,6 +301,12 @@ textarea {
     animation: shake 0.5s ease-in-out;
 }
 
+footer {
+    text-align: center;
+    margin-top: 20px; 
+}
+
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
