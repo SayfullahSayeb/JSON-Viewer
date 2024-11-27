@@ -39,10 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage.classList.add('visible', 'shake');
         formattedOutput.textContent = '';
         treeView.innerHTML = '';
-        
+
+
         setTimeout(() => {
             errorMessage.classList.remove('shake');
         }, 500);
+    }
+
+
+    // Clear Error Message
+    function clearError() {
+        errorMessage.classList.remove('visible');
+        errorMessage.textContent = '';
     }
 
 
@@ -67,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Format JSON Button
     formatBtn.addEventListener('click', () => {
         const input = jsonInput.value.trim();
-        
+
+
         if (!input) {
             showError('Please enter JSON data');
             return;
@@ -83,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             jsonInput.value = '';
-            errorMessage.classList.remove('visible');
+            clearError();
             updateOutput();
         } catch (err) {
             showError(err.message);
@@ -103,7 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        
+
+
         if (!file) {
             showError('No file selected');
             return;
@@ -126,14 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         const reader = new FileReader();
-        
+
+
         reader.onload = (e) => {
             const content = e.target.result;
             try {
                 parsedJSON = JSON.parse(content);
+                clearError(); // Clear error message when a valid file is uploaded
                 updateOutput();
             } catch (err) {
                 showError('Invalid JSON in file');
+                parsedJSON = null; // Reset parsedJSON on error
             }
         };
 
@@ -152,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         jsonInput.value = '';
         formattedOutput.textContent = '';
         treeView.innerHTML = '';
-        errorMessage.classList.remove('visible');
+        clearError(); // Clear any error messages
         parsedJSON = null;
         resetFileInput();
     });
