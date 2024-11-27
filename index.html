@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Viewer</title>
+    <title>Dark JSON Viewer</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -16,8 +16,13 @@
                 <i class="fas fa-sun"></i>
             </button>
         </header>
+        
 
         <div class="input-section">
+            <div class="url-input-section">
+                <input type="text" id="urlInput" placeholder="Enter JSON URL" />
+                <button id="fetchUrlBtn">Fetch JSON from URL</button>
+            </div>
             <div class="input-controls">
                 <input type="file" id="fileInput" accept=".json" hidden>
                 <button id="uploadBtn" class="btn">
@@ -46,6 +51,7 @@
                     <i class="fas fa-download"></i> Download
                 </button>
             </div>
+        
             <div id="jsonViewer" class="json-viewer">
                 <pre id="formattedOutput"></pre>
                 <div id="treeView" class="tree-view"></div>
