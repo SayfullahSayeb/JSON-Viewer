@@ -1,0 +1,57 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark JSON Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <header>
+            <h1>JSON Viewer</h1>
+            <button id="themeToggle" class="theme-toggle">
+                <i class="fas fa-sun"></i>
+            </button>
+        </header>
+
+        <div class="input-section">
+            <div class="input-controls">
+                <input type="file" id="fileInput" accept=".json" hidden>
+                <button id="uploadBtn" class="btn">
+                    <i class="fas fa-upload"></i> Upload JSON
+                </button>
+                <button id="clearBtn" class="btn">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+                <button id="formatBtn" class="btn primary">
+                    <i class="fas fa-code"></i> Format JSON
+                </button>
+            </div>
+            <textarea id="jsonInput" placeholder="Paste your JSON here..."></textarea>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div class="viewer-section">
+            <div class="viewer-controls">
+                <button id="viewToggle" class="btn">
+                    <i class="fas fa-code"></i> Toggle View
+                </button>
+                <button id="copyBtn" class="btn">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button id="downloadBtn" class="btn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+            <div id="jsonViewer" class="json-viewer">
+                <pre id="formattedOutput"></pre>
+                <div id="treeView" class="tree-view"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
