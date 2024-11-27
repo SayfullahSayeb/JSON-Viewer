@@ -24,7 +24,6 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-
 .dark-mode {
     background-color: var(--bg-dark);
     color: var(--text-dark);
@@ -90,8 +89,6 @@ header {
     background-color: #4CAF50;
 }
 
-
-
 .theme-toggle {
     background: none;
     border: none;
@@ -105,7 +102,7 @@ header {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px;
+    margin: 5px 5px 5px 0px;
     background-color: #333;
     color: white;
     transition: all 0.3s ease;
