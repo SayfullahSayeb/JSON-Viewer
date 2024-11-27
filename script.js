@@ -13,8 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const formattedOutput = document.getElementById('formattedOutput');
     const treeView = document.getElementById('treeView');
 
+
     let currentView = 'tree';
     let parsedJSON = null;
+
+
+    // Reset file input to allow re-uploading the same file
+    function resetFileInput() {
+        fileInput.value = '';
+    }
+
 
     // Theme Toggle
     themeToggle.addEventListener('click', () => {
@@ -25,8 +33,55 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.classList.toggle('fa-moon');
     });
 
+
+    // Common JSON parsing function
+    function parseAndDisplayJSON(input, isFile = false) {
+        try {
+            // Trim input if it's not from a file
+            const jsonString = isFile ? input : input.trim();
+            
+            if (!jsonString) {
+                showError('Please enter JSON data');
+                return false;
+            }
+
+
+            // Parse the JSON
+            parsedJSON = JSON.parse(jsonString);
+            
+            // Validate that parsed JSON is an object or array
+            if (parsedJSON === null || typeof parsedJSON !== 'object') {
+                throw new Error('Invalid JSON structure. Must be an object or array.');
+            }
+
+
+            // Clear input and error message
+            if (!isFile) {
+                jsonInput.value = '';
+            }
+            errorMessage.classList.remove('visible');
+
+
+            // Update output
+            updateOutput();
+            return true;
+        } catch (err) {
+            showError(err.message);
+            parsedJSON = null;
+            treeView.innerHTML = '';
+            formattedOutput.textContent = '';
+            return false;
+        }
+    }
+
+
     // File Upload with Validation
-    uploadBtn.addEventListener('click', () => fileInput.click());
+    uploadBtn.addEventListener('click', () => {
+        resetFileInput();
+        fileInput.click();
+    });
+
+
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         
@@ -36,51 +91,125 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+
         // Validate file extension
         if (!file.name.toLowerCase().endsWith('.json')) {
             showError('Please upload a valid JSON file (.json)');
-            fileInput.value = ''; // Clear the file input
+            resetFileInput();
             return;
         }
+
 
         // Validate file size (optional, set to 5MB here)
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
             showError('File size too large. Maximum size is 5MB');
-            fileInput.value = '';
+            resetFileInput();
             return;
         }
+
 
         const reader = new FileReader();
         
         reader.onload = (e) => {
-            try {
-                const content = e.target.result;
-                // Try to parse the JSON to validate its structure
-                parsedJSON = JSON.parse(content);
-                
-                // Check if the parsed result is null or not an object
-                if (!parsedJSON || typeof parsedJSON !== 'object') {
-                    throw new Error('Invalid JSON structure');
-                }
-
-                jsonInput.value = '';
-                errorMessage.classList.remove('visible');
-                updateOutput();
-            } catch (err) {
-                showError('Invalid JSON format in file. Please check the file contents.');
-                parsedJSON = null;
-                treeView.innerHTML = '';
-                formattedOutput.textContent = '';
-            }
+            const content = e.target.result;
+            parseAndDisplayJSON(content, true);
         };
+
 
         reader.onerror = () => {
             showError('Error reading file');
         };
 
+
         reader.readAsText(file);
     });
+
+
+    // Format JSON
+    formatBtn.addEventListener('click', () => {
+        const input = jsonInput.value;
+        parseAndDisplayJSON(input);
+    });
+
+
+    // Clear
+    clearBtn.addEventListener('click', () => {
+        jsonInput.value = '';
+        formattedOutput.textContent = '';
+        treeView.innerHTML = '';
+        errorMessage.classList.remove('visible');
+        parsedJSON = null;
+        resetFileInput();
+    });
+
+
+    // View Toggle
+    viewToggle.addEventListener('click', () => {
+        if (!parsedJSON) return;
+        currentView = currentView === 'tree' ? 'formatted' : 'tree';
+        updateOutput();
+    });
+
+
+    // Copy
+    copyBtn.addEventListener('click', () => {
+        if (!parsedJSON) return;
+        const textToCopy = JSON.stringify(parsedJSON, null, 2);
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                const oldText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = oldText;
+                }, 2000);
+            });
+    });
+
+
+    // Download
+    downloadBtn.addEventListener('click', () => {
+        if (!parsedJSON) return;
+        const blob = new Blob([JSON.stringify(parsedJSON, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'formatted.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+
+    function showError(message) {
+        errorMessage.textContent = `Error: ${message}`;
+        errorMessage.classList.add('visible');
+        // Add shake animation to error message
+        errorMessage.classList.add('shake');
+        setTimeout(() => {
+            errorMessage.classList.remove('shake');
+        }, 500);
+        formattedOutput.textContent = '';
+        treeView.innerHTML = '';
+    }
+
+
+    function updateOutput() {
+        if (!parsedJSON) return;
+
+
+        if (currentView === 'formatted') {
+            formattedOutput.style.display = 'block';
+            treeView.style.display = 'none';
+            formattedOutput.textContent = JSON.stringify(parsedJSON, null, 2);
+        } else {
+            formattedOutput.style.display = 'none';
+            treeView.style.display = 'block';
+            treeView.innerHTML = '';
+            createTreeView(parsedJSON, treeView);
+        }
+    }
 
     // Format JSON with better validation
     formatBtn.addEventListener('click', () => {
