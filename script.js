@@ -1,102 +1,213 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('themeToggle');
+    // DOM Elements
     const fileInput = document.getElementById('fileInput');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    const urlInput = document.getElementById('urlInput');
     const jsonInput = document.getElementById('jsonInput');
-    const formatBtn = document.getElementById('formatBtn');
+    const fetchUrlBtn = document.getElementById('fetchUrlBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const formattedOutput = document.getElementById('formattedOutput');
+    const treeView = document.getElementById('treeView');
     const errorMessage = document.getElementById('errorMessage');
     const viewToggle = document.getElementById('viewToggle');
     const copyBtn = document.getElementById('copyBtn');
     const downloadBtn = document.getElementById('downloadBtn');
-    const formattedOutput = document.getElementById('formattedOutput');
-    const treeView = document.getElementById('treeView');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const urlInput = document.getElementById('urlInput');
-    const fetchUrlBtn = document.getElementById('fetchUrlBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const clearBtn = document.getElementById('clearBtn');
     const body = document.body;
 
 
-    let currentView = 'tree';
-    let parsedJSON = null;
-
+    // State Variables
+    let currentJSON = null;
+    let currentView = 'tree'; // Default to tree view first
 
     // Theme Toggle Functionality
     themeToggle.addEventListener('click', () => {
         if (body.classList.contains('dark-mode')) {
             body.classList.remove('dark-mode');
             body.classList.add('light-mode');
-            // Update icon if needed
             themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
             localStorage.setItem('theme', 'light');
         } else {
             body.classList.remove('light-mode');
             body.classList.add('dark-mode');
-            // Update icon if needed
             themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             localStorage.setItem('theme', 'dark');
         }
     });
+    
+        // Check saved theme on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.remove('dark-mode');
+            body.classList.add('light-mode');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+            body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
 
-
-    // Check saved theme on page load
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    } else {
-        // Default to dark mode
-        body.classList.add('dark-mode');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-
-
-    // Reset file input to allow re-uploading the same file
-    function resetFileInput() {
+    // Clear Button Functionality
+    clearBtn.addEventListener('click', () => {
+        // Reset all inputs
         fileInput.value = '';
-    }
+        urlInput.value = '';
+        jsonInput.value = '';
 
 
-    // Clear Error Message
-    function clearError() {
-        errorMessage.classList.remove('visible');
-        errorMessage.textContent = '';
-    }
-
-
-    // Show Error Function
-    function showError(message) {
-        errorMessage.textContent = `Error: ${message}`;
-        errorMessage.classList.add('visible', 'shake');
+        // Clear outputs
         formattedOutput.textContent = '';
         treeView.innerHTML = '';
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+
+
+        // Reset state
+        currentJSON = null;
+        currentView = 'tree';
+    });
+
+
+    // Improved Tree View Renderer
+    function renderTreeView(data, container) {
+        container.innerHTML = ''; // Clear previous content
+
+
+        function createDetailedTreeElement(obj, depth = 0) {
+            if (typeof obj !== 'object' || obj === null) {
+                return document.createTextNode(String(obj));
+            }
+
+
+            const treeContainer = document.createElement('div');
+            treeContainer.className = 'json-tree';
+
+
+            Object.entries(obj).forEach(([key, value]) => {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'tree-item';
+                itemWrapper.style.paddingLeft = `${depth * 20}px`;
+
+
+                const keyElement = document.createElement('span');
+                keyElement.className = 'tree-key';
+                keyElement.textContent = key;
+
+
+                const valueElement = document.createElement('span');
+                valueElement.className = 'tree-value';
+
+
+                if (typeof value === 'object' && value !== null) {
+                    const detailsEl = document.createElement('details');
+                    const summaryEl = document.createElement('summary');
+                    summaryEl.appendChild(keyElement);
+                    summaryEl.innerHTML += Array.isArray(value) 
+                        ? ` <span class="type">[${value.length} items]</span>` 
+                        : ` <span class="type">{${Object.keys(value).length} props}</span>`;
+                    detailsEl.appendChild(summaryEl);
+                    const nestedContent = createDetailedTreeElement(value, depth + 1);
+                    detailsEl.appendChild(nestedContent);
+                    itemWrapper.appendChild(detailsEl);
+                } else {
+                    itemWrapper.appendChild(keyElement);
+                    const separator = document.createElement('span');
+                    separator.textContent = ': ';
+                    separator.className = 'separator';
+                    itemWrapper.appendChild(separator);
+                    valueElement.textContent = JSON.stringify(value);
+                    itemWrapper.appendChild(valueElement);
+                }
+
+
+                treeContainer.appendChild(itemWrapper);
+            });
+
+
+            return treeContainer;
+        }
+
+
+        container.appendChild(createDetailedTreeElement(data));
     }
 
 
-    // Update Output Function
-    function updateOutput() {
-        if (!parsedJSON) return;
+    // Update View Function
+    function updateView() {
+        if (!currentJSON) return;
 
 
-        if (currentView === 'formatted') {
-            formattedOutput.style.display = 'block';
-            treeView.style.display = 'none';
-            formattedOutput.textContent = JSON.stringify(parsedJSON, null, 2);
-        } else {
-            formattedOutput.style.display = 'none';
+        formattedOutput.style.display = 'none';
+        treeView.style.display = 'none';
+
+
+        if (currentView === 'tree') {
             treeView.style.display = 'block';
-            treeView.innerHTML = '';
-            createTreeView(parsedJSON, treeView);
+            renderTreeView(currentJSON, treeView);
+        } else {
+            formattedOutput.style.display = 'block';
+            formattedOutput.textContent = JSON.stringify(currentJSON, null, 2);
         }
     }
 
 
-    // Fetch JSON from URL
+    // View Toggle
+    viewToggle.addEventListener('click', () => {
+        currentView = currentView === 'tree' ? 'formatted' : 'tree';
+        updateView();
+    });
+
+
+    // File Upload Handler
+    function handleFileUpload(file) {
+        if (!file) {
+            showError('No file selected');
+            return;
+        }
+
+
+        if (!file.name.toLowerCase().endsWith('.json')) {
+            showError('Please upload a valid JSON file');
+            return;
+        }
+
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                currentJSON = JSON.parse(e.target.result);
+                urlInput.value = '';
+                jsonInput.value = '';
+                clearError();
+                currentView = 'tree'; // Default to tree view
+                updateView();
+            } catch (error) {
+                showError(`JSON Parsing Error: ${error.message}`);
+            }
+        };
+        reader.onerror = () => {
+            showError('Error reading file');
+        };
+        reader.readAsText(file);
+    }
+
+
+    // File Input Event
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFileUpload(file);
+    });
+
+
+    // Upload Button Event
+    uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+
+    // URL Fetch Handler
     fetchUrlBtn.addEventListener('click', async () => {
         const url = urlInput.value.trim();
-
-
+        
         if (!url) {
             showError('Please enter a URL');
             return;
@@ -110,204 +221,60 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error('URL does not point to valid JSON data');
-            }
-
-
-            const data = await response.json();
-            parsedJSON = data; // Store the parsed JSON
-            clearError(); // Clear previous error messages
-            updateOutput(); // Update the output with the fetched JSON
-            urlInput.value = ''; // Clear the URL input box
+            const jsonData = await response.json();
+            currentJSON = jsonData;
+            jsonInput.value = '';
+            fileInput.value = '';
+            clearError();
+            currentView = 'tree'; // Default to tree view
+            updateView();
         } catch (error) {
-            showError(error.message); // Show error message for fetching
-            parsedJSON = null; // Reset parsedJSON on error
+            showError(`URL Fetch Error: ${error.message}`);
+        }
+    });
+
+
+    // JSON Input (Textarea) Event
+    jsonInput.addEventListener('input', () => {
+        const jsonText = jsonInput.value.trim();
+        
+        if (!jsonText) {
+            currentJSON = null;
             formattedOutput.textContent = '';
             treeView.innerHTML = '';
-        }
-    });
-
-
-    // File Upload
-    uploadBtn.addEventListener('click', () => {
-        resetFileInput();
-        fileInput.click();
-    });
-
-
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-
-
-        // Clear JSON input box and filename display when file is selected
-        jsonInput.value = '';
-        fileNameDisplay.textContent = ''; // Clear previous filename
-
-
-        if (!file) {
-            showError('No file selected');
             return;
         }
 
 
-        if (!file.name.toLowerCase().endsWith('.json')) {
-            showError('Please upload a valid JSON file (.json)');
-            resetFileInput();
-            return;
+        try {
+            currentJSON = JSON.parse(jsonText);
+            urlInput.value = '';
+            fileInput.value = '';
+            clearError();
+            currentView = 'tree'; // Default to tree view
+            updateView();
+        } catch (error) {
+            showError(`JSON Parsing Error: ${error.message}`);
         }
-
-
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-        if (file.size > maxSize) {
-            showError('File size too large. Maximum size is 5MB');
-            resetFileInput();
-            return;
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = (e) => {
-            const content = e.target.result;
-            try {
-                parsedJSON = JSON.parse(content);
-                fileNameDisplay.textContent = `Loaded: ${file.name}`;
-                clearError();
-                updateOutput();
-            } catch (err) {
-                showError('Invalid JSON file');
-                fileNameDisplay.textContent = ''; // Clear filename on error
-                parsedJSON = null;
-                formattedOutput.textContent = '';
-                treeView.innerHTML = '';
-            }
-        };
-
-
-        reader.onerror = () => {
-            showError('Error reading file');
-            fileNameDisplay.textContent = ''; // Clear filename on error
-            parsedJSON = null;
-            formattedOutput.textContent = '';
-            treeView.innerHTML = '';
-        };
-
-
-        reader.readAsText(file);
     });
 
 
-    // Clear Button
-    clearBtn.addEventListener('click', () => {
-        jsonInput.value = '';
+    // Error Handling Functions
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
         formattedOutput.textContent = '';
         treeView.innerHTML = '';
-        fileNameDisplay.textContent = ''; // Clear filename
-        clearError();
-        parsedJSON = null;
-        resetFileInput();
-        urlInput.value = ''; // Clear the URL input box
-    });
-
-
-    // View Toggle
-    viewToggle.addEventListener('click', () => {
-        if (!parsedJSON) return;
-        currentView = currentView === 'tree' ? 'formatted' : 'tree';
-        updateOutput();
-    });
-
-
-    // Copy Button
-    copyBtn.addEventListener('click', () => {
-        if (!parsedJSON) return;
-        const textToCopy = JSON.stringify(parsedJSON, null, 2);
-        navigator.clipboard.writeText(textToCopy)
-            .then(() => {
-                const oldText = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    copyBtn.innerHTML = oldText;
-                }, 2000);
-            });
-    });
-
-
-    // Download Button
-    downloadBtn.addEventListener('click', () => {
-        if (!parsedJSON) return;
-        const blob = new Blob([JSON.stringify(parsedJSON, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'formatted.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
-
-
-    // Create Tree View Function
-    function createTreeView(data, parent) {
-        if (typeof data === 'object' && data !== null) {
-            Object.entries(data).forEach(([key, value]) => {
-                const item = document.createElement('div');
-                item.className = 'tree-item';
-
-
-                const keySpan = document.createElement('span');
-                keySpan.className = 'key';
-                keySpan.textContent = `${key}`;
-
-
-                if (typeof value === 'object' && value !== null) {
-                    const collapsible = document.createElement('div');
-                    collapsible.className = 'collapsible';
-                    
-                    const expander = document.createElement('span');
-                    expander.className = 'expander';
-                    expander.textContent = '▶';
-                    
-                    const content = document.createElement('div');
-                    content.className = 'collapsed-content';
-                    content.style.display = 'none';
-                    
-                    collapsible.appendChild(expander);
-                    collapsible.appendChild(keySpan);
-                    collapsible.appendChild(document.createTextNode(': ' + (Array.isArray(value) ? '[' : '{')));
-                    
-                    item.appendChild(collapsible);
-                    item.appendChild(content);
-                    
-                    createTreeView(value, content);
-                    
-                    const closingBrace = document.createElement('div');
-                    closingBrace.className = 'closing-brace';
-                    closingBrace.style.paddingLeft = '20px';
-                    closingBrace.textContent = Array.isArray(value) ? ']' : '}';
-                    item.appendChild(closingBrace);
-                    
-                    collapsible.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        expander.textContent = content.style.display === 'none' ? '▼' : '▶';
-                        content.style.display = content.style.display === 'none' ? 'block' : 'none';
-                    });
-                } else {
-                    const valueSpan = document.createElement('span');
-                    valueSpan.className = `value ${typeof value}`;
-                    valueSpan.textContent = JSON.stringify(value);
-                    
-                    item.appendChild(keySpan);
-                    item.appendChild(document.createTextNode(': '));
-                    item.appendChild(valueSpan);
-                }
-                
-                parent.appendChild(item);
-            });
-        }
     }
+
+
+    function clearError() {
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+    }
+
+
+    // Initialize theme on load (Optional)
+    // function initializeTheme() { /* theme initialization logic */ }
+    // initializeTheme();
 });
