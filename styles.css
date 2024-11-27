@@ -24,6 +24,7 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
+
 .dark-mode {
     background-color: var(--bg-dark);
     color: var(--text-dark);
@@ -46,6 +47,47 @@ header {
     align-items: center;
     margin-bottom: 20px;
 }
+
+.url-input-section {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    border-radius: 15px;
+
+}
+
+.url-input-section input {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    color: var(--text-dark);
+    background-color: var(--json-bg);
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.url-input-section input:focus {
+    border-color: #fff;
+    outline: none;
+}
+
+.url-input-section button {
+    padding: 12px 20px;
+    margin-left: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.url-input-section button:active {
+    background-color: #4CAF50;
+}
+
 
 .theme-toggle {
     background: none;
@@ -205,9 +247,23 @@ textarea {
     textarea {
         height: 150px;
     }
+
+    .url-input-section {
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+
+    .url-input-section input {
+        margin-bottom: 10px;
+    }
+
+
+    .url-input-section button {
+        margin-left: 0; 
+        width: 100%; 
+    }
 }
 
-/* Add to your existing styles.css */
 .error-message {
     color: var(--error);
     margin-top: 10px;
