@@ -265,6 +265,7 @@ textarea {
 }
 
 .error-message {
+    font-family: 'Consolas', monospace;
     color: var(--error);
     margin-top: 10px;
     padding: 10px;
@@ -278,6 +279,21 @@ textarea {
     display: block;
 }
 
+.success {
+    font-family: 'Consolas', monospace;
+    color: var(--success); 
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+    background-color: rgba(76, 175, 80, 0.1); 
+    border-left: 4px solid var(--success); 
+}
+
+.success.visible {
+    display: block;
+}
+
 /* Add shake animation for error message */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -288,6 +304,11 @@ textarea {
 .error-message.shake {
     animation: shake 0.5s ease-in-out;
 }
+
+.success {
+    animation: shake 0.5s ease-in-out;
+}
+
 
 /* Style for file input validation */
 .input-controls .btn:disabled {
