@@ -191,11 +191,118 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // File Input Event
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        handleFileUpload(file);
-    });
+// File Input Event
+fileInput.addEventListener('click', (e) => {
+    // Reset the input to allow selecting the same file again
+    e.target.value = '';
+});
+
+
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    handleFileUpload(file);
+});
+
+
+// File Upload Handler
+function handleFileUpload(file) {
+    if (!file) {
+        showError('No file selected');
+        return;
+    }
+
+
+    // Check file extension (case-insensitive)
+    if (!file.name.toLowerCase().endsWith('.json')) {
+        showError('Please upload a valid JSON file');
+        fileInput.value = ''; // Clear the input
+        clearFileName(); // Clear the displayed file name
+        return;
+    }
+
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            // Parse the file content
+            const fileContent = e.target.result;
+
+
+            // Attempt to parse JSON
+            currentJSON = JSON.parse(fileContent);
+
+
+            // Clear other input fields
+            urlInput.value = '';
+            jsonInput.value = '';
+
+
+            // Clear any previous errors
+            clearError();
+
+
+            // Set default view to tree
+            currentView = 'tree';
+
+
+            // Display the file name
+            displayFileName(file.name); // Call to a function to display the file name
+            document.getElementById('fileNameDisplay').classList.add('success', 'visible');
+
+
+            // Update the view
+            updateView();
+        } catch (error) {
+            // Show parsing error with the file name
+            showError(`JSON Parsing Error in file "${file.name}": ${error.message}`);
+
+
+            // Clear URL and JSON textarea if there is an error
+            urlInput.value = '';
+            jsonInput.value = '';
+            clearFileName(); // Clear the displayed file name
+        }
+    };
+
+
+    reader.onerror = () => {
+        showError(`Error reading file "${file.name}"`);
+        clearFileName(); // Clear the displayed file name
+    };
+
+
+    // Read the file as text
+    reader.readAsText(file);
+}
+
+
+// Function to display the file name
+function displayFileName(fileName) {
+    const fileNameDisplay = document.getElementById('fileNameDisplay'); // Assuming you have an element with this ID
+    fileNameDisplay.textContent = `Loaded File: ${fileName}`; // Update the display
+}
+
+
+// Function to clear the displayed file name
+function clearFileName() {
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    fileNameDisplay.textContent = ''; // Clear the display
+}
+
+
+// Function to handle data from URL or JSON input
+function handleDataFromInput() {
+    // Assuming you have logic here to handle data from URL or JSON input
+    // After processing the data, clear the file name
+    clearFileName();
+}
+
+
+// Function to display the file name
+function displayFileName(fileName) {
+    const fileNameDisplay = document.getElementById('fileNameDisplay'); // Assuming you have an element with this ID
+    fileNameDisplay.textContent = `Loaded File: ${fileName}`; // Update the display
+}
 
 
     // Upload Button Event
