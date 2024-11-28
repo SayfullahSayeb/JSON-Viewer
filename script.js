@@ -1,387 +1,341 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
-    const fileInput = document.getElementById('fileInput');
-    const urlInput = document.getElementById('urlInput');
-    const jsonInput = document.getElementById('jsonInput');
-    const fetchUrlBtn = document.getElementById('fetchUrlBtn');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const formattedOutput = document.getElementById('formattedOutput');
-    const treeView = document.getElementById('treeView');
-    const errorMessage = document.getElementById('errorMessage');
-    const viewToggle = document.getElementById('viewToggle');
-    const copyBtn = document.getElementById('copyBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const themeToggle = document.getElementById('themeToggle');
-    const clearBtn = document.getElementById('clearBtn');
-    const body = document.body;
+/* styles.css */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-light: #ffffff;
+    --text-dark: #e0e0e0;
+    --text-light: #333333;
+    --primary: #4CAF50;
+    --secondary: #2196F3;
+    --error: #f44336;
+    --border-dark: #333333;
+    --border-light: #dddddd;
+    --json-bg: #2d2d2d;
+}
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    // State Variables
-    let currentJSON = null;
-    let currentView = 'tree'; // Default to tree view first
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-    // Theme Toggle Functionality
-    themeToggle.addEventListener('click', () => {
-        if (body.classList.contains('dark-mode')) {
-            body.classList.remove('dark-mode');
-            body.classList.add('light-mode');
-            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            localStorage.setItem('theme', 'light');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark-mode');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            localStorage.setItem('theme', 'dark');
-        }
-    });
-    
-        // Check saved theme on page load
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            body.classList.remove('dark-mode');
-            body.classList.add('light-mode');
-            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        } else {
-            body.classList.add('dark-mode');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
+.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
 
-    // Clear Button Functionality
-    clearBtn.addEventListener('click', () => {
-        // Reset all inputs
-        fileInput.value = '';
-        urlInput.value = '';
-        jsonInput.value = '';
+.light-mode {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+}
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        // Clear outputs
-        formattedOutput.textContent = '';
-        treeView.innerHTML = '';
-        errorMessage.textContent = '';
-        errorMessage.style.display = 'none';
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
+.url-input-section {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    border-radius: 15px;
+    font-family: 'Arial', sans-serif; 
+}
 
-        // Reset state
-        currentJSON = null;
-        currentView = 'tree';
-    });
+.url-input-section input {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    color: var(--text-dark);
+    background-color: var(--json-bg);
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    transition: border-color 0.3s;
+    font-family: 'Consolas', monospace; 
+}
 
+.url-input-section input:focus {
+    border-color: #fff;
+    outline: none;
+}
 
-    // Improved Tree View Renderer
-    function renderTreeView(data, container) {
-        container.innerHTML = ''; // Clear previous content
+.url-input-section button {
+    padding: 12px 20px;
+    margin-left: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-family: 'Arial', sans-serif;
+}
 
+.url-input-section button:active {
+    background-color: #4CAF50;
+}
 
-        function createDetailedTreeElement(obj, depth = 0) {
-            if (typeof obj !== 'object' || obj === null) {
-                return document.createTextNode(String(obj));
-            }
+.theme-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
 
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0px;
+    background-color: #333;
+    color: white;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 
-            const treeContainer = document.createElement('div');
-            treeContainer.className = 'json-tree';
+.btn:hover {
+    background-color: #444;
+    transform: translateY(-1px);
+}
 
+.btn.primary {
+    background-color: var(--primary);
+}
 
-            Object.entries(obj).forEach(([key, value]) => {
-                const itemWrapper = document.createElement('div');
-                itemWrapper.className = 'tree-item';
-                itemWrapper.style.paddingLeft = `${depth * 20}px`;
+.input-section, .viewer-section {
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+}
 
+.input-controls, .viewer-controls {
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
 
-                const keyElement = document.createElement('span');
-                keyElement.className = 'tree-key';
-                keyElement.textContent = key;
+textarea {
+    width: 100%;
+    height: 200px;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: var(--json-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--border-dark);
+    resize: vertical;
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+}
 
+.error-message {
+    color: var(--error);
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+}
 
-                const valueElement = document.createElement('span');
-                valueElement.className = 'tree-value';
+.error-message.visible {
+    display: block;
+    background-color: rgba(244, 67, 54, 0.1);
+}
 
+.json-viewer {
+    background-color: var(--json-bg);
+    border-radius: 4px;
+    padding: 15px;
+    overflow-x: auto;
+    border: 1px solid var(--border-dark);
+}
 
-                if (typeof value === 'object' && value !== null) {
-                    const detailsEl = document.createElement('details');
-                    const summaryEl = document.createElement('summary');
-                    summaryEl.appendChild(keyElement);
-                    summaryEl.innerHTML += Array.isArray(value) 
-                        ? ` <span class="type">[${value.length} items]</span>` 
-                        : ` <span class="type">{${Object.keys(value).length} props}</span>`;
-                    detailsEl.appendChild(summaryEl);
-                    const nestedContent = createDetailedTreeElement(value, depth + 1);
-                    detailsEl.appendChild(nestedContent);
-                    itemWrapper.appendChild(detailsEl);
-                } else {
-                    itemWrapper.appendChild(keyElement);
-                    const separator = document.createElement('span');
-                    separator.textContent = ': ';
-                    separator.className = 'separator';
-                    itemWrapper.appendChild(separator);
-                    valueElement.textContent = JSON.stringify(value);
-                    itemWrapper.appendChild(valueElement);
-                }
+/* Tree View Styles */
+.tree-view {
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
 
+.tree-item {
+    padding: 2px 0;
+    margin-left: 20px;
+}
 
-                treeContainer.appendChild(itemWrapper);
-            });
+.collapsible {
+    cursor: pointer;
+    user-select: none;
+}
 
+.collapsible:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
 
-            return treeContainer;
-        }
+.key {
+    color: #9cdcfe;
+}
 
+.value {
+    color: #ce9178;
+}
 
-        container.appendChild(createDetailedTreeElement(data));
+.value.number {
+    color: #b5cea8;
+}
+
+.value.boolean {
+    color: #569cd6;
+}
+
+.value.null {
+    color: #569cd6;
+}
+
+.expander {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    color: #666;
+}
+
+.collapsed-content {
+    margin-left: 20px;
+}
+
+.closing-brace {
+    color: #e0e0e0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    .input-controls, .viewer-controls {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    textarea {
+        height: 150px;
+    }
+
+    .url-input-section {
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+
+    .url-input-section input {
+        margin-bottom: 10px;
     }
 
 
-    // Update View Function
-    function updateView() {
-        if (!currentJSON) return;
-
-
-        formattedOutput.style.display = 'none';
-        treeView.style.display = 'none';
-
-
-        if (currentView === 'tree') {
-            treeView.style.display = 'block';
-            renderTreeView(currentJSON, treeView);
-        } else {
-            formattedOutput.style.display = 'block';
-            formattedOutput.textContent = JSON.stringify(currentJSON, null, 2);
-        }
+    .url-input-section button {
+        margin-left: 0; 
+        width: 100%; 
     }
+}
 
+.error-message {
+    color: var(--error);
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+    background-color: rgba(244, 67, 54, 0.1);
+    border-left: 4px solid var(--error);
+}
 
-    // View Toggle
-    viewToggle.addEventListener('click', () => {
-        currentView = currentView === 'tree' ? 'formatted' : 'tree';
-        updateView();
-    });
+.error-message.visible {
+    display: block;
+}
 
+#fileNameDisplay.visible {
+    display: block;
+}
 
-    // File Upload Handler
-    function handleFileUpload(file) {
-        if (!file) {
-            showError('No file selected');
-            return;
-        }
-
-
-        if (!file.name.toLowerCase().endsWith('.json')) {
-            showError('Please upload a valid JSON file');
-            return;
-        }
-
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                currentJSON = JSON.parse(e.target.result);
-                urlInput.value = '';
-                jsonInput.value = '';
-                clearError();
-                currentView = 'tree'; // Default to tree view
-                updateView();
-            } catch (error) {
-                showError(`JSON Parsing Error: ${error.message}`);
-            }
-        };
-        reader.onerror = () => {
-            showError('Error reading file');
-        };
-        reader.readAsText(file);
-    }
-
-
-// File Input Event
-fileInput.addEventListener('click', (e) => {
-    // Reset the input to allow selecting the same file again
-    e.target.value = '';
-});
-
-
-fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    handleFileUpload(file);
-});
-
-
-// File Upload Handler
-function handleFileUpload(file) {
-    if (!file) {
-        showError('No file selected');
-        return;
-    }
-
-
-    // Check file extension (case-insensitive)
-    if (!file.name.toLowerCase().endsWith('.json')) {
-        showError('Please upload a valid JSON file');
-        fileInput.value = ''; // Clear the input
-        clearFileName(); // Clear the displayed file name
-        return;
-    }
-
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            // Parse the file content
-            const fileContent = e.target.result;
-
-
-            // Attempt to parse JSON
-            currentJSON = JSON.parse(fileContent);
-
-
-            // Clear other input fields
-            urlInput.value = '';
-            jsonInput.value = '';
-
-
-            // Clear any previous errors
-            clearError();
-
-
-            // Set default view to tree
-            currentView = 'tree';
-
-
-            // Display the file name
-            displayFileName(file.name); // Call to a function to display the file name
-            document.getElementById('fileNameDisplay').classList.add('success', 'visible');
-
-
-            // Update the view
-            updateView();
-        } catch (error) {
-            // Show parsing error with the file name
-            showError(`JSON Parsing Error in file "${file.name}": ${error.message}`);
-
-
-            // Clear URL and JSON textarea if there is an error
-            urlInput.value = '';
-            jsonInput.value = '';
-            clearFileName(); // Clear the displayed file name
-        }
-    };
-
-
-    reader.onerror = () => {
-        showError(`Error reading file "${file.name}"`);
-        clearFileName(); // Clear the displayed file name
-    };
-
-
-    // Read the file as text
-    reader.readAsText(file);
+#fileNameDisplay {
+    color: #ffffff;
+    background-color: #4CAF50;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+    margin: 10px 0;
 }
 
 
-// Function to display the file name
-function displayFileName(fileName) {
-    const fileNameDisplay = document.getElementById('fileNameDisplay'); // Assuming you have an element with this ID
-    fileNameDisplay.textContent = `Loaded File: ${fileName}`; // Update the display
+/* Add shake animation for error message */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.error-message.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Style for file input validation */
+.input-controls .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Add visual feedback for invalid file selection */
+.input-controls .btn.error {
+    background-color: var(--error);
+    animation: shake 0.5s ease-in-out;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px; 
 }
 
 
-// Function to clear the displayed file name
-function clearFileName() {
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    fileNameDisplay.textContent = ''; // Clear the display
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-
-// Function to handle data from URL or JSON input
-function handleDataFromInput() {
-    // Assuming you have logic here to handle data from URL or JSON input
-    // After processing the data, clear the file name
-    clearFileName();
+::-webkit-scrollbar-track {
+    background: var(--json-bg);
 }
 
-
-// Function to display the file name
-function displayFileName(fileName) {
-    const fileNameDisplay = document.getElementById('fileNameDisplay'); // Assuming you have an element with this ID
-    fileNameDisplay.textContent = `Loaded File: ${fileName}`; // Update the display
+::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 4px;
 }
 
-
-    // Upload Button Event
-    uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-
-    // URL Fetch Handler
-    fetchUrlBtn.addEventListener('click', async () => {
-        const url = urlInput.value.trim();
-        
-        if (!url) {
-            showError('Please enter a URL');
-            return;
-        }
-
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-
-            const jsonData = await response.json();
-            currentJSON = jsonData;
-            jsonInput.value = '';
-            fileInput.value = '';
-            clearError();
-            currentView = 'tree'; // Default to tree view
-            updateView();
-        } catch (error) {
-            showError(`URL Fetch Error: ${error.message}`);
-        }
-    });
-
-
-    // JSON Input (Textarea) Event
-    jsonInput.addEventListener('input', () => {
-        const jsonText = jsonInput.value.trim();
-        
-        if (!jsonText) {
-            currentJSON = null;
-            formattedOutput.textContent = '';
-            treeView.innerHTML = '';
-            return;
-        }
-
-
-        try {
-            currentJSON = JSON.parse(jsonText);
-            urlInput.value = '';
-            fileInput.value = '';
-            clearError();
-            currentView = 'tree'; // Default to tree view
-            updateView();
-        } catch (error) {
-            showError(`JSON Parsing Error: ${error.message}`);
-        }
-    });
-
-
-    // Error Handling Functions
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-        formattedOutput.textContent = '';
-        treeView.innerHTML = '';
-    }
-
-
-    function clearError() {
-        errorMessage.textContent = '';
-        errorMessage.style.display = 'none';
-    }
-
-
-    // Initialize theme on load (Optional)
-    // function initializeTheme() { /* theme initialization logic */ }
-    // initializeTheme();
-});
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
