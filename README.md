@@ -20,12 +20,6 @@ A simple and interactive web application for viewing and formatting JSON data. U
 - **Font Awesome** - Icons used for theme toggle and other actions.
 
 
-## Installation
-
-Clone the repository to your local machine by running the following command in your terminal or command prompt: <pre> <code> git clone https://github.com/SayfullahSayeb/JSON-Viewer/ </code> </pre> 
-
-Open `index.html` in your browser That's it! No build process or server required.
-
 ## Contributing
 
 Feel free to fork the repository, create issues, and submit pull requests. Contributions are always welcome! Please follow the standard GitHub guidelines for submitting code or suggestions.
