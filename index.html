@@ -1,71 +1,1123 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Viewer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Material Design 3 - JSON Viewer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Material Design 3 Color System */
+        :root {
+            /* Primary Colors */
+            --primary: #06a77d;
+            --primary-container: #a5f3d8;
+            --on-primary: #ffffff;
+            --on-primary-container: #00210f;
+            
+            /* Secondary Colors */
+            --secondary: #4a635b;
+            --secondary-container: #cce8e0;
+            --on-secondary: #ffffff;
+            --on-secondary-container: #05201a;
+            
+            /* Tertiary Colors */
+            --tertiary: #3d6668;
+            --tertiary-container: #c2ecf0;
+            --on-tertiary: #ffffff;
+            --on-tertiary-container: #001f22;
+            
+            /* Surface Colors */
+            --surface: #fffbfe;
+            --surface-dim: #ddd7e0;
+            --surface-bright: #fffbfe;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f7f2f6;
+            --surface-container: #f3eef2;
+            --surface-container-high: #ede7eb;
+            --surface-container-highest: #e7e1e6;
+            
+            /* On Surface */
+            --on-surface: #1c1b20;
+            --on-surface-variant: #49454e;
+            
+            /* Error */
+            --error: #b3261e;
+            --error-container: #f9dedc;
+            --on-error: #ffffff;
+            --on-error-container: #410e0b;
+            
+            /* Outline */
+            --outline: #79747e;
+            --outline-variant: #cac7d0;
+            
+            /* Inverse */
+            --inverse-surface: #313033;
+            --inverse-on-surface: #f4eff4;
+            --inverse-primary: #7dd9c4;
+            
+            /* Spacing (4dp baseline) */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 24px;
+            --spacing-2xl: 32px;
+            --spacing-3xl: 40px;
+            
+            /* Corner Radius */
+            --radius-xs: 4px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 28px;
+            
+            /* Elevation - Material Design 3 */
+            --elevation-0: none;
+            --elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
+            --elevation-2: 0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23);
+            --elevation-3: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 3px 6px rgba(0, 0, 0, 0.23);
+            --elevation-4: 0px 15px 25px rgba(0, 0, 0, 0.15), 0px 5px 10px rgba(0, 0, 0, 0.05);
+            --elevation-5: 0px 20px 40px rgba(0, 0, 0, 0.2);
+            
+            /* Typography */
+            --font-display-large: 57px;
+            --font-display-medium: 45px;
+            --font-display-small: 36px;
+            --font-headline-large: 32px;
+            --font-headline-medium: 28px;
+            --font-headline-small: 24px;
+            --font-title-large: 22px;
+            --font-title-medium: 16px;
+            --font-title-small: 14px;
+            --font-body-large: 16px;
+            --font-body-medium: 14px;
+            --font-body-small: 12px;
+            --font-label-large: 12px;
+            --font-label-medium: 12px;
+            --font-label-small: 11px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            font-size: var(--font-body-large);
+            line-height: 1.5;
+        }
+
+        /* Main Layout */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: var(--spacing-lg);
+            min-height: 100vh;
+            padding: var(--spacing-xl);
+            background-color: var(--surface);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Brand Header */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-container);
+            color: var(--on-primary-container);
+            border-radius: var(--radius-md);
+            font-size: 20px;
+        }
+
+        .brand a {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-title {
+            font-size: var(--font-title-large);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--on-surface);
+        }
+
+        .brand-subtitle {
+            font-size: var(--font-label-medium);
+            color: var(--on-surface-variant);
+        }
+
+        /* Card Container */
+        .card {
+            background-color: var(--surface-container-high);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+            box-shadow: var(--elevation-1);
+            border: 1px solid var(--outline-variant);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .card.elevated {
+            box-shadow: var(--elevation-2);
+            background-color: var(--surface-container-low);
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: var(--font-title-small);
+            font-weight: 600;
+            color: var(--on-surface-variant);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* URL Input Section */
+        .url-input-section {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .url-input-section input {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--surface-container-lowest);
+            color: var(--on-surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-body-medium);
+            font-family: 'Fira Code', 'Roboto Mono', monospace;
+            transition: border-color 150ms cubic-bezier(0.2, 0, 0, 1), 
+                        box-shadow 150ms cubic-bezier(0.2, 0, 0, 1),
+                        background-color 150ms cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .url-input-section input:hover {
+            border-color: var(--on-surface-variant);
+            background-color: var(--surface-container);
+        }
+
+        .url-input-section input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: var(--surface-container-lowest);
+            box-shadow: 0 0 0 3px var(--primary) opacity(0.12);
+        }
+
+        /* Button System - Material Design 3 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: var(--font-label-large);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 150ms cubic-bezier(0.2, 0, 0, 1);
+            min-height: 48px;
+            min-width: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Filled Button (Primary) */
+        .btn.filled {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            box-shadow: var(--elevation-0);
+        }
+
+        .btn.filled:hover {
+            background-color: #059373;
+            box-shadow: var(--elevation-1);
+        }
+
+        .btn.filled:active {
+            box-shadow: var(--elevation-0);
+        }
+
+        /* Outlined Button */
+        .btn.outlined {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+
+        .btn.outlined:hover {
+            background-color: rgba(6, 168, 125, 0.08);
+        }
+
+        .btn.outlined:active {
+            background-color: rgba(6, 168, 125, 0.12);
+        }
+
+        /* Tonal Button */
+        .btn.tonal {
+            background-color: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        .btn.tonal:hover {
+            background-color: #8fe8d0;
+            box-shadow: var(--elevation-1);
+        }
+
+        /* Text Button */
+        .btn.text {
+            background-color: transparent;
+            color: var(--primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .btn.text:hover {
+            background-color: rgba(6, 168, 125, 0.08);
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .button-group.vertical {
+            flex-direction: column;
+        }
+
+        /* Input Control */
+        .input-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        /* Textarea */
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: var(--spacing-lg);
+            background-color: var(--surface-container-lowest);
+            color: var(--on-surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-sm);
+            font-family: 'Fira Code', 'Roboto Mono', monospace;
+            font-size: var(--font-body-small);
+            resize: vertical;
+            transition: border-color 150ms cubic-bezier(0.2, 0, 0, 1),
+                        box-shadow 150ms cubic-bezier(0.2, 0, 0, 1),
+                        background-color 150ms cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        textarea:hover {
+            border-color: var(--on-surface-variant);
+            background-color: var(--surface-container);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: var(--surface-container-lowest);
+            box-shadow: 0 0 0 3px rgba(6, 168, 125, 0.12);
+        }
+
+        /* File Input */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--error-container);
+            color: var(--error);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--error);
+            font-size: var(--font-body-small);
+            font-weight: 500;
+            gap: var(--spacing-md);
+            align-items: center;
+            animation: slideDown 200ms cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .error-message.visible {
+            display: flex;
+        }
+
+        /* File Name Display */
+        .file-name-display {
+            display: none;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--primary-container);
+            color: var(--on-primary-container);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-body-small);
+            font-weight: 500;
+            gap: var(--spacing-md);
+            align-items: center;
+            animation: slideDown 200ms cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .file-name-display.visible {
+            display: flex;
+        }
+
+        /* Main Preview Area */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        /* Viewer Card */
+        .viewer-card {
+            background-color: var(--surface-container-high);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+            box-shadow: var(--elevation-1);
+            border: 1px solid var(--outline-variant);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            flex: 1;
+            min-height: 400px;
+            position: relative;
+            min-height: 800px;
+            max-height: 800px;
+            overflow: hidden;
+        }
+
+        /* Viewer Header Section */
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--outline-variant);
+            padding-bottom: var(--spacing-md);
+        }
+
+        /* Viewer Controls */
+        .viewer-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .viewer-controls .btn {
+            background-color: var(--surface-container);
+            color: var(--on-surface);
+            box-shadow: none;
+            border: none;
+        }
+
+        .viewer-controls .btn:hover {
+            background-color: var(--surface-container-highest);
+        }
+
+        .viewer-controls .btn.active {
+            background-color: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        /* Formatted Toggle Icon Button */
+        .formatted-toggle-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--on-surface-variant);
+            font-size: 18px;
+            cursor: pointer;
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            transition: all 100ms cubic-bezier(0.2, 0, 0, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .formatted-toggle-btn:hover {
+            background-color: rgba(6, 168, 125, 0.08);
+            color: var(--primary);
+        }
+
+        .formatted-toggle-btn:active {
+            background-color: rgba(6, 168, 125, 0.12);
+        }
+
+        /* JSON Viewer */
+        .json-viewer {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-lg);
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Roboto Mono', monospace;
+            font-size: var(--font-body-small);
+            line-height: 1.6;
+            position: relative;
+        }
+
+        pre {
+            margin: 0;
+            color: var(--on-surface);
+        }
+
+        /* Tree View Styling */
+        .tree-view {
+            font-family: 'Fira Code', 'Roboto Mono', monospace;
+            font-size: var(--font-body-small);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .tree-item {
+            padding: var(--spacing-xs) 0;
+            padding-left: 20px;
+            border-radius: var(--radius-xs);
+            transition: background-color 100ms cubic-bezier(0.2, 0, 0, 1),
+                        color 100ms cubic-bezier(0.2, 0, 0, 1);
+            cursor: pointer;
+        }
+
+        .tree-item:hover {
+            background-color: rgba(6, 168, 125, 0.08);
+            color: var(--primary);
+        }
+
+        .tree-key {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tree-value {
+            color: #d97706;
+        }
+
+        .tree-value.number,
+        .tree-value.boolean {
+            color: #0891b2;
+        }
+
+        .tree-value.null {
+            color: var(--on-surface-variant);
+            font-style: italic;
+        }
+
+        .type {
+            color: var(--on-surface-variant);
+            font-size: var(--font-body-small);
+        }
+
+        .separator {
+            color: var(--on-surface-variant);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface-container);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--outline-variant);
+            border-radius: var(--radius-full);
+            transition: background 150ms;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+            color: var(--on-surface-variant);
+            font-size: var(--font-body-small);
+            border-top: 1px solid var(--outline-variant);
+            margin-top: var(--spacing-lg);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design - Tablet (Medium) */
+        @media (max-width: 1024px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+                padding: var(--spacing-lg);
+            }
+
+            .sidebar {
+                max-height: auto;
+            }
+
+            .viewer-card {
+                min-height: 300px;
+            }
+        }
+
+        /* Responsive Design - Mobile (Compact) */
+        @media (max-width: 600px) {
+            :root {
+                --spacing-xl: 16px;
+                --spacing-lg: 12px;
+                --spacing-md: 8px;
+            }
+
+            .wrapper {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+                padding: var(--spacing-lg);
+                min-height: auto;
+            }
+
+            .card,
+            .viewer-card {
+                padding: var(--spacing-lg);
+            }
+
+            .brand {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
+
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .brand-title {
+                font-size: var(--font-title-medium);
+            }
+
+            .url-input-section {
+                flex-direction: column;
+            }
+
+            .url-input-section input,
+            .url-input-section button {
+                width: 100%;
+            }
+
+            .button-group {
+                gap: var(--spacing-md);
+            }
+
+            .btn {
+                flex: 1;
+                min-height: 44px;
+            }
+
+            textarea {
+                min-height: 120px;
+                font-size: 13px;
+            }
+
+            .json-viewer {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .viewer-controls {
+                flex-direction: column;
+            }
+
+            .viewer-card {
+                min-height: 250px;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface: #1c1b20;
+                --surface-dim: #131119;
+                --surface-bright: #2a2930;
+                --surface-container-lowest: #0f0e13;
+                --surface-container-low: #1a1925;
+                --surface-container: #1f1e23;
+                --surface-container-high: #29282d;
+                --surface-container-highest: #343338;
+                
+                --on-surface: #fffbfe;
+                --on-surface-variant: #cac7d0;
+                
+                --outline: #938f99;
+                --outline-variant: #49454e;
+            }
+        }
+    </style>
 </head>
-<body class="dark-mode">
-    <div class="container">
-        <header>
-            <h1>
-                <a href="https://github.com/SayfullahSayeb/JSON-Viewer/" target="_blank" style="text-decoration: none; color: inherit;">
-                    <i class="fab fa-github"></i> JSON Viewer
+<body>
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <a href="https://github.com/SayfullahSayeb/JSON-Viewer/" target="_blank">
+                    <div class="brand-title">JSON Viewer</div>
+                    <div class="brand-subtitle">by Sayfullah</div>
                 </a>
-            </h1>
-            <button id="themeToggle" class="theme-toggle">
-                <i class="fas fa-sun"></i>
-            </button>
-        </header>
+            </div>
 
-        <div class="input-section">
-            <div class="url-input-section">
-                <input type="text" id="urlInput" placeholder="Enter JSON URL" />
-                <button id="fetchUrlBtn">Fetch JSON from URL</button>
-            </div>
-            <div class="input-controls">
-                <input type="file" id="fileInput" accept=".json" hidden>
-                <button id="uploadBtn" class="btn">
-                    <i class="fas fa-upload"></i> Upload JSON
-                </button>
-                <button id="clearBtn" class="btn">
-                    <i class="fas fa-trash"></i> Clear
-                </button>
-                <button id="formatBtn" class="btn primary">
-                    <i class="fas fa-code"></i> Format JSON
-                </button>
-            </div>
-            <textarea id="jsonInput" placeholder="Paste your JSON here..."></textarea>
-            <div id="errorMessage" class="error-message"></div>
-            <div id="fileNameDisplay"></div>
-        </div>
+            <div class="card">
+                <h2 class="section-title">Configuration</h2>
+                
+                <div class="url-input-section">
+                    <input type="text" id="urlInput" placeholder="Enter JSON URL">
+                    <button id="fetchUrlBtn" class="btn filled">
+                        <i class="fas fa-cloud-download-alt"></i> Fetch
+                    </button>
+                </div>
 
-        <div class="viewer-section">
-            <div class="viewer-controls">
-                <button id="viewToggle" class="btn">
-                    <i class="fas fa-code"></i> Toggle View
-                </button>
-                <button id="copyBtn" class="btn">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-                <button id="downloadBtn" class="btn">
-                    <i class="fas fa-download"></i> Download
-                </button>
+                <div class="input-controls">
+                    <input type="file" id="fileInput" accept=".json" hidden>
+                    <button id="uploadBtn" class="btn outlined">
+                        <i class="fas fa-upload"></i> Upload
+                    </button>
+                    <button id="clearBtn" class="btn outlined">
+                        <i class="fas fa-trash"></i> Clear
+                    </button> 
+
+                    <button id="formatBtn" class="btn filled">
+                        <i class="fas fa-code"></i> Format
+                    </button>
+<button id="dashboardBtn" class="btn outlined" style="margin-top:8px;">
+    <i class="fas fa-th-large"></i> JSON Dataview
+</button>
+
+                </div>
+
+                <textarea id="jsonInput" placeholder="Paste your JSON here..."></textarea>
+
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <div id="fileNameDisplay" class="file-name-display">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="fileNameText"></span>
+                </div>
             </div>
-        
-            <div id="jsonViewer" class="json-viewer">
-                <pre id="formattedOutput"></pre>
-                <div id="treeView" class="tree-view"></div>
+        </aside>
+
+        <main class="preview-panel">
+            <div class="viewer-card">
+                <div class="viewer-header">
+                    <h2 class="section-title">Preview</h2>
+
+
+ <div class="viewer-controls">
+
+                    <button id="formattedToggleBtn" class="formatted-toggle-btn" title="Toggle formatted view">
+                        <i class="fas fa-code"></i>
+                    </button>
+
+
+                    <button id="copyBtn" class="btn outlined">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button id="downloadBtn" class="btn outlined">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+
+
+                </div>
+
+               
+
+                <div id="jsonViewer" class="json-viewer">
+                    <pre id="formattedOutput" style="display:none;"></pre>
+                    <div id="treeView" class="tree-view"></div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
-    <footer>
-        <p>&copy; 2024 Sayfullah Sayeb. All rights reserved.</p>
-    </footer>
-    
-    <script src="script.js"></script>
+
+<footer>
+    <p>
+        &copy; 2025 Sayfullah Sayeb. All rights reserved. |
+        <a href="https://github.com/SayfullahSayeb/JSON-Viewer" target="_blank" style="color:inherit; text-decoration:underline;">
+            GitHub Repo
+        </a>
+    </p>
+</footer>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const fileInput = document.getElementById('fileInput');
+    const urlInput = document.getElementById('urlInput');
+    const jsonInput = document.getElementById('jsonInput');
+    const fetchUrlBtn = document.getElementById('fetchUrlBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const formattedOutput = document.getElementById('formattedOutput');
+    const treeView = document.getElementById('treeView');
+    const errorMessage = document.getElementById('errorMessage');
+    const formattedToggleBtn = document.getElementById('formattedToggleBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const formatBtn = document.getElementById('formatBtn');
+
+    // State Variables
+    let currentJSON = null;
+    let currentView = 'tree'; // Always start with tree view
+
+    // Clear Button Functionality
+    clearBtn.addEventListener('click', () => {
+        // Reset all inputs
+        fileInput.value = '';
+        urlInput.value = '';
+        jsonInput.value = '';
+
+        // Clear outputs
+        formattedOutput.textContent = '';
+        treeView.innerHTML = '';
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+
+        // Reset state
+        currentJSON = null;
+        currentView = 'tree';
+        updateView();
+    });
+
+    // Improved Tree View Renderer
+    function renderTreeView(data, container) {
+        container.innerHTML = '';
+
+        function createDetailedTreeElement(obj, depth = 0) {
+            if (typeof obj !== 'object' || obj === null) {
+                return document.createTextNode(String(obj));
+            }
+
+            const treeContainer = document.createElement('div');
+            treeContainer.className = 'json-tree';
+
+            Object.entries(obj).forEach(([key, value]) => {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'tree-item';
+                itemWrapper.style.paddingLeft = `${depth * 20}px`;
+
+                const keyElement = document.createElement('span');
+                keyElement.className = 'tree-key';
+                keyElement.textContent = key;
+
+                const valueElement = document.createElement('span');
+                valueElement.className = 'tree-value';
+
+                if (typeof value === 'object' && value !== null) {
+                    const detailsEl = document.createElement('details');
+                    const summaryEl = document.createElement('summary');
+                    summaryEl.appendChild(keyElement);
+                    summaryEl.innerHTML += Array.isArray(value) 
+                        ? ` <span class="type">[${value.length} items]</span>` 
+                        : ` <span class="type">{${Object.keys(value).length} props}</span>`;
+                    detailsEl.appendChild(summaryEl);
+                    const nestedContent = createDetailedTreeElement(value, depth + 1);
+                    detailsEl.appendChild(nestedContent);
+                    itemWrapper.appendChild(detailsEl);
+                } else {
+                    itemWrapper.appendChild(keyElement);
+                    const separator = document.createElement('span');
+                    separator.textContent = ': ';
+                    separator.className = 'separator';
+                    itemWrapper.appendChild(separator);
+                    valueElement.textContent = JSON.stringify(value);
+                    itemWrapper.appendChild(valueElement);
+                }
+
+                treeContainer.appendChild(itemWrapper);
+            });
+
+            return treeContainer;
+        }
+
+        container.appendChild(createDetailedTreeElement(data));
+    }
+
+    // Update View Function
+    function updateView() {
+        if (!currentJSON) return;
+
+        formattedOutput.style.display = 'none';
+        treeView.style.display = 'none';
+
+        if (currentView === 'tree') {
+            treeView.style.display = 'block';
+            renderTreeView(currentJSON, treeView);
+        } else {
+            formattedOutput.style.display = 'block';
+            formattedOutput.textContent = JSON.stringify(currentJSON, null, 2);
+        }
+    }
+
+    // Formatted Toggle Button
+    formattedToggleBtn.addEventListener('click', () => {
+        currentView = currentView === 'tree' ? 'formatted' : 'tree';
+        updateView();
+        // Change icon
+        if (currentView === 'formatted') {
+            formattedToggleBtn.innerHTML = '<i class="fas fa-sitemap"></i>';
+            formattedToggleBtn.title = 'Show tree view';
+        } else {
+            formattedToggleBtn.innerHTML = '<i class="fas fa-code"></i>';
+            formattedToggleBtn.title = 'Show formatted view';
+        }
+    });
+
+    // File Upload Handler
+    function handleFileUpload(file) {
+        if (!file) {
+            showError('No file selected');
+            return;
+        }
+
+        if (!file.name.toLowerCase().endsWith('.json')) {
+            showError('Please upload a valid JSON file');
+            fileInput.value = '';
+            clearFileName();
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                currentJSON = JSON.parse(e.target.result);
+                urlInput.value = '';
+                jsonInput.value = '';
+                clearError();
+                currentView = 'tree';
+                displayFileName(file.name);
+                updateView();
+            } catch (error) {
+                showError(`JSON Parsing Error: ${error.message}`);
+                fileInput.value = '';
+                clearFileName();
+            }
+        };
+        reader.onerror = () => {
+            showError(`Error reading file "${file.name}"`);
+            clearFileName();
+        };
+        reader.readAsText(file);
+    }
+
+    // File Input Event
+    fileInput.addEventListener('click', (e) => {
+        e.target.value = '';
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFileUpload(file);
+    });
+
+    // Upload Button Event
+    uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // URL Fetch Handler
+    fetchUrlBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        
+        if (!url) {
+            showError('Please enter a URL');
+            return;
+        }
+
+        fetchUrlBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+        fetchUrlBtn.disabled = true;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            currentJSON = await response.json();
+            jsonInput.value = '';
+            fileInput.value = '';
+            clearError();
+            clearFileName();
+            currentView = 'tree';
+            updateView();
+        } catch (error) {
+            showError(`URL Fetch Error: ${error.message}`);
+        } finally {
+            fetchUrlBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Fetch';
+            fetchUrlBtn.disabled = false;
+        }
+    });
+
+    // Format Button
+    formatBtn.addEventListener('click', () => {
+        const jsonText = jsonInput.value.trim();
+        if (!jsonText) {
+            showError('Please paste JSON first');
+            return;
+        }
+        try {
+            currentJSON = JSON.parse(jsonText);
+            clearError();
+            clearFileName();
+            currentView = 'tree';
+            updateView();
+        } catch (error) {
+            showError(`JSON Format Error: ${error.message}`);
+        }
+    });
+
+    // JSON Input (Textarea) Event
+    jsonInput.addEventListener('input', () => {
+        const jsonText = jsonInput.value.trim();
+        
+        if (!jsonText) {
+            currentJSON = null;
+            formattedOutput.textContent = '';
+            treeView.innerHTML = '';
+            clearFileName();
+            clearError();
+            return;
+        }
+
+        try {
+            currentJSON = JSON.parse(jsonText);
+            urlInput.value = '';
+            fileInput.value = '';
+            clearError();
+            clearFileName();
+            currentView = 'tree';
+            updateView();
+        } catch (error) {
+            showError(`JSON Parsing Error: ${error.message}`);
+        }
+    });
+
+    // Copy to Clipboard
+    copyBtn.addEventListener('click', () => {
+        if (!currentJSON) {
+            showError('No JSON data to copy');
+            return;
+        }
+        const jsonString = JSON.stringify(currentJSON, null, 2);
+        navigator.clipboard.writeText(jsonString).then(() => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(() => {
+            showError('Failed to copy to clipboard');
+        });
+    });
+
+    // Download JSON
+    downloadBtn.addEventListener('click', () => {
+        if (!currentJSON) {
+            showError('No JSON data to download');
+            return;
+        }
+        const jsonString = JSON.stringify(currentJSON, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `data-${Date.now()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    });
+
+    // Error Handling Functions
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        formattedOutput.textContent = '';
+        treeView.innerHTML = '';
+    }
+
+    function clearError() {
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+    }
+
+    // File name display functions
+    function displayFileName(fileName) {
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        if (fileNameDisplay) {
+            const fileNameText = document.getElementById('fileNameText');
+            if (fileNameText) fileNameText.textContent = fileName;
+            fileNameDisplay.classList.add('visible');
+        }
+    }
+
+    function clearFileName() {
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        if (fileNameDisplay) {
+            fileNameDisplay.classList.remove('visible');
+        }
+    }
+});
+
+</script>
+
 </body>
 </html>
