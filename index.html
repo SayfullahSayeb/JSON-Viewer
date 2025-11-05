@@ -772,12 +772,7 @@
                         <i class="fas fa-download"></i> Download
                     </button>
                 </div>
-
-
                 </div>
-
-               
-
                 <div id="jsonViewer" class="json-viewer">
                     <pre id="formattedOutput" style="display:none;"></pre>
                     <div id="treeView" class="tree-view"></div>
@@ -1024,6 +1019,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
+    document.getElementById('dashboardBtn').addEventListener('click', function() {
+    window.open("/json2dashboard.html", "_blank");
+});
+
+
     // JSON Input (Textarea) Event
     jsonInput.addEventListener('input', () => {
         const jsonText = jsonInput.value.trim();
@@ -1121,3 +1122,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
