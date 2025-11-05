@@ -214,8 +214,8 @@
             font-size: var(--font-body-medium);
             font-family: 'Fira Code', 'Roboto Mono', monospace;
             transition: border-color 150ms cubic-bezier(0.2, 0, 0, 1), 
-                        box-shadow 150ms cubic-bezier(0.2, 0, 0, 1),
-                        background-color 150ms cubic-bezier(0.2, 0, 0, 1);
+            box-shadow 150ms cubic-bezier(0.2, 0, 0, 1),
+            background-color 150ms cubic-bezier(0.2, 0, 0, 1);
         }
 
         .url-input-section input:hover {
@@ -229,6 +229,16 @@
             background-color: var(--surface-container-lowest);
             box-shadow: 0 0 0 3px var(--primary) opacity(0.12);
         }
+
+        pre {
+        margin: 0;
+        color: var(--on-surface);
+        white-space: pre-wrap;  
+        word-break: break-word;     
+        overflow-x: auto;           
+        max-width: 100%;            
+        }
+
 
         /* Button System - Material Design 3 */
         .btn {
@@ -1117,5 +1127,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
