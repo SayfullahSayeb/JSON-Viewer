@@ -12,13 +12,6 @@ A simple and interactive web application for viewing and formatting JSON data. U
 - **Copy and Download**: Copy the displayed JSON to the clipboard or download it as a file.
 - **Error Handling**: Informative error messages for invalid URLs, files, or JSON data.
 
-## Technologies Used
-
-- **HTML** - Structure and layout of the application.
-- **CSS** - Styling and layout design.
-- **JavaScript** - Functionality for JSON parsing, theme toggling, and user interactions.
-- **Font Awesome** - Icons used for theme toggle and other actions.
-
 
 ## Contributing
 
